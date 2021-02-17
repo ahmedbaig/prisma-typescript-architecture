@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "target": "es6",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "outDir": "lib"
+    },
+    "exclude": [
+        "node_modules",
+    ],
+    "lib": [
+        "es2015"
+    ]
+}

@@ -1,10 +1,1 @@
-{
-    "version": 3,
-    "file": "index.js",
-    "sourceRoot": "",
-    "sources": [
-        "../../../../../../../app/http/controller/api/web/error/index.ts"
-    ],
-    "names": [],
-    "mappings": "AAAA,YAAY,CAAC;;;;;;;;;;;;;;;;;;;;;;;;;AAEb,sDAA8B;AAC9B,+DAAgD;AAEnC,QAAA,WAAW,GAAG,iBAAO,CAAC,MAAM,EAAE,CAAC;AAE5C,mBAAW,CAAC,GAAG,CAAC,MAAM,EAAE,UAAU,CAAC,cAAc,CAAC,CAAC;AAEnD,mBAAW,CAAC,GAAG,CAAC,MAAM,EAAE,UAAU,CAAC,qBAAqB,CAAC,CAAC"
-}
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../../../../../app/http/controller/api/web/error/index.ts"],"names":[],"mappings":"AAAA,YAAY,CAAC;;;;;;;;;;;;;;;;;;;;;;;;;AAEb,sDAA8B;AAC9B,+DAAgD;AAEnC,QAAA,WAAW,GAAG,iBAAO,CAAC,MAAM,EAAE,CAAC;AAE5C,mBAAW,CAAC,GAAG,CAAC,MAAM,EAAE,UAAU,CAAC,cAAc,CAAC,CAAC;AAEnD,mBAAW,CAAC,GAAG,CAAC,MAAM,EAAE,UAAU,CAAC,qBAAqB,CAAC,CAAC"}

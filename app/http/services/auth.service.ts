@@ -99,3 +99,36 @@ export let generateAuthToken = ({ _id, type }, callback) => {
     var token = jwt.sign(payload, privateKEY, signOptions);
     return callback(token);
 }
+
+export let verifyNewAccountToken = async function (token, { errorCallback, callback }) {
+    TokenService.findOne({ token }).then((alreadyExist: any = {}) => {
+        if (alreadyExist == null) {
+            //   Token does not exist 
+            return errorCallback({
+                success: false,
+                status: 400,
+                msg: "Token does not exist.",
+            })
+        } else {
+            // Token exists
+            if (moment(alreadyExist.expiresIn).isSameOrAfter(moment()) == true) {
+                //   Already exists and has not expired yet
+                TokenService.findOneAndRemove({ token: alreadyExist.token })
+                    .then(() => callback({ success: true, token: null, userId: alreadyExist.userId }))
+                    .catch(error => errorCallback({ success: false, status: 500, msg: error }));
+            } else {
+                // Already exists and has expired get new token
+                var new_token = Buffer.from(generateOTP()).toString("base64");
+                let user = { _id: alreadyExist.userId };
+                TokenService.findOneAndRemove({ token: alreadyExist.token })
+                    .then(
+                        async () => {
+                            createToken(user, new_token, null)
+                                .then((data) => callback({ success: true, token: data, userId: alreadyExist.userId }))
+                                .catch(error => errorCallback({ success: false, status: 500, msg: error }));
+                        }
+                    ).catch(error => errorCallback({ success: false, status: 500, msg: error }));
+            }
+        }
+    });
+};

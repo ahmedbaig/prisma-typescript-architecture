@@ -3,7 +3,6 @@ const _ = require('lodash');
 import moment, { fn } from 'moment';
 import * as UserService from '../../../services/user.service';
 import { generateAuthToken } from "../../../services/auth.service";
-// import { sendUserVerifyEmail } from "../../../mail";
 import { setUserStateToken } from '../../../../cache/redis.service';
 import { OAuth2Client } from 'google-auth-library';
 

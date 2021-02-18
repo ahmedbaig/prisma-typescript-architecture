@@ -143,7 +143,7 @@ export let passwordCheck = function ({ password, user }) {
 }
 
 
-const update = function (query, data, options = null) {
+export let update = function (query, data, options = null) {
     return new Promise(function (resolve, reject) {
         User.update(query, data, options, function (err, result) {
             if (err) {
@@ -152,6 +152,24 @@ const update = function (query, data, options = null) {
                 resolve(result);
             }
         })
+
+    })
+}
+
+export let findById = function (userId) {
+    return new Promise(function (resolve, reject) {
+        User.findById(userId, select)
+            .then((user) => {
+                if (user) {
+                    resolve(user);
+                } else if (!user) {
+                    reject({ msg: 'User not found.' });
+                }
+            }).catch((err) => {
+                if (err) {
+                    reject(err);
+                }
+            })
 
     })
 }

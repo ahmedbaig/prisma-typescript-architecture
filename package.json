@@ -4,8 +4,8 @@
   "description": "",
   "main": "./lib/app",
   "scripts": {
-    "start": " tsc && set NODE_ENV=production&&nodemon ./lib/bin/www",
-    "dev": "tsc && set NODE_ENV=development&&nodemon ./lib/bin/www",
+    "start": " tsc&&set NODE_ENV=production&&node ./lib/bin/www",
+    "dev": "tsc&&set NODE_ENV=development&&node ./lib/bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Muhammad Salahuddin",

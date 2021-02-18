@@ -21,9 +21,6 @@ app.set("port", port);
 /**
  * Create HTTP server.
  */
-console.log(process.env.MONGO_USER, "process.env.MONGO_USER")
-console.log(process.env.MONGO_PASS, 'process.env.MONGO_PASS')
-console.log(process.env.MONGO_CLUSTER, 'process.env.MONGO_CLUSTER')
 var server = http.createServer(app);
 /* Make sure to change URI before deployment */
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_CLUSTER}/${config.get('db.name')}?retryWrites=true&w=majority`;

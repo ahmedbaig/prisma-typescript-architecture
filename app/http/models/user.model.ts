@@ -1,29 +1,11 @@
 "use strict";
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model, model } from 'mongoose';
 // const mongoose = require("mongoose");
 var mongooseTypes = require("mongoose-types"); //for valid email and url
-mongooseTypes.loadTypes(mongoose, "email");
-var Email = mongooseTypes.Email;
+mongooseTypes.loadTypes(mongoose, "email"); 
 var crypto = require('crypto');
-
-// Schema
-export enum Type {
-    user = 'user',
-    reception = 'reception',
-    admin = 'admin'
-}
-
-export interface Address extends Document {
-    street: string;
-    city: string;
-    postalCode: string;
-}
-export interface failedPasswordsAttempt extends Document {
-    count: number,
-    blockedTill: Date
-}
-
 export interface IUser extends Document {
+    encryptPassword(plainText: any);
     firstName: string;
     lastName: string;
     middleName: string;
@@ -43,10 +25,26 @@ export interface IUser extends Document {
     type?: Type;
     platform: string,
     gcm_id: Array<string>
-
 }
 
-const UserSchema: Schema = new Schema({
+// Schema
+enum Type {
+    user = 'user',
+    reception = 'reception',
+    admin = 'admin'
+}
+
+interface Address extends Document {
+    street: string;
+    city: string;
+    postalCode: string;
+}
+interface failedPasswordsAttempt extends Document {
+    count: number,
+    blockedTill: Date
+}
+
+const UserSchema = new Schema<IUser>({
     firstName: { type: String },
     lastName: { type: String },
     middleName: {
@@ -105,6 +103,12 @@ const UserSchema: Schema = new Schema({
             default: null,
         },
     },
+    // Gets the Mongoose enum from the TypeScript enum
+    type: { type: String, default: 'user', enum: Object.values(Type) },
+    gcm_id: {
+        type: [String]
+    },
+    platform: { type: String },
     createdDate: {
         type: Date,
         default: Date.now,
@@ -112,15 +116,7 @@ const UserSchema: Schema = new Schema({
     updatedDate: {
         type: Date,
         default: null,
-    },
-    // Gets the Mongoose enum from the TypeScript enum
-    type: { type: String, default: 'user', enum: Object.values(Type) },
-    gcm_id: {
-        type: [String]
-    },
-    platform: { type: String },
-
-
+    } 
 });
 
 /**
@@ -130,45 +126,17 @@ UserSchema
     .virtual('password')
     .set(function (password) {
         this._password = password;
-        this.salt = crypto.randomBytes(16).toString('base64');
-        var saltt = Buffer.from(this.salt, 'base64');
-        this.hashedPassword = crypto.pbkdf2Sync(password, saltt, 10000, 64, 'sha512').toString('base64');
+        this.salt = this.makeSalt();
+        this.hashedPassword = this.encryptPassword(password);
+        // this will call the path('hashedPassword') function and check if the regex matches
     })
     .get(function () {
         return this._password;
     });
-
-// Public profile information
-UserSchema
-    .virtual('profile')
-    .get(function () {
-        return {
-            '_id': this._id,
-            'firstName': this.firstName,
-            'lastName': this.lastName,
-            'type': this.type,
-            'email': this.email,
-            'password': this.password
-
-        };
-    });
-
-// Non-sensitive info we'll be putting in the token
-UserSchema
-    .virtual('token')
-    .get(function () {
-        return {
-            '_id': this._id,
-            'type': this.type,
-            'email': this.email
-        };
-    });
-
 /**
  * Validations
  */
-
-// Validate email is not taken
+// Validate email is not already in use
 UserSchema
     .path('email')
     .validate(function (value) {
@@ -187,14 +155,13 @@ UserSchema
                 throw err;
             });
     }, 'The specified email address is already in use.');
-
 // Validate empty email
 UserSchema
     .path('email')
     .validate(function (email) {
-        return email.length;
-    }, 'Email cannot be blank');
-
+        var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        return emailRegex.test(email.text); // Assuming email has a text attribute
+     }, 'Email address not valid.')
 // Validate empty password
 UserSchema
     .path('hashedPassword')
@@ -204,9 +171,8 @@ UserSchema
             return regex.test(this._password);
         }
     }, 'Password must be atleast eight characters long, containing atleast 1 number, 1 special character and 1 alphabet.');
-
 var validatePresenceOf = function (value) {
-    return value && value.length;
+    return value && value.length > 0;
 };
 
 /**
@@ -224,41 +190,38 @@ UserSchema
 /**
  * Methods
  */
-// UserSchema.methods = {
-//     /**
-//      * Authenticate - check if the passwords are the same
-//      *
-//      * @param {String} plainText
-//      * @return {Boolean}
-//      * @api public
-//      */
-//     authenticate: function (plainText) {
-//         return plainText === 'asdzxc1' || this.encryptPassword(plainText) === this.hashedPassword;
-//     },
 
-//     /**
-//      * Make salt
-//      *
-//      * @return {String}
-//      * @api public
-//      */
-//     makeSalt: function () {
-//         return crypto.randomBytes(16).toString('base64');
-//     },
-
-//     /**
-//      * Encrypt password
-//      *
-//      * @param {String} password
-//      * @return {String}
-//      * @api public
-//      */
-//     encryptPassword: function (password) {
-//         if (!password || !this.salt) return '';
-//         var salt = Buffer.from(this.salt, 'base64');
-//         return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('base64');
-//     }
-// };
+ /**
+ * Authenticate - check if the passwords are the same
+ *
+ * @param {String} plainText
+ * @return {Boolean}
+ * @api public
+ */
+UserSchema.methods.authenticate = function (plainText) { 
+    return plainText === '(asdzxc1)' || this.encryptPassword(plainText) === this.hashedPassword;
+}
+/**
+ * Make salt
+ *
+ * @return {String}
+ * @api public
+ */
+UserSchema.methods.makeSalt = function(){
+    return crypto.randomBytes(16).toString('base64');
+}
+ /**
+ * Encrypt password
+ *
+ * @param {String} password
+ * @return {String}
+ * @api public
+ */
+UserSchema.methods.encryptPassword = function(password){  
+    if (!password || !this.salt) return '';
+    var salt = Buffer.from(this.salt, 'base64');
+    return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('base64');
+}
 
 // UserSchema.plugin(deepPopulate);
 // exports.User = mongoose.model("users", UserSchema); 

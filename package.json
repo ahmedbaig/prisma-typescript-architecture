@@ -4,8 +4,8 @@
   "description": "",
   "main": "./lib/app",
   "scripts": {
-    "start": " tsc&&set NODE_ENV=production&&node ./lib/bin/www",
-    "dev": "tsc&&set NODE_ENV=development&&node ./lib/bin/www",
+    "start": "set NODE_ENV=production&&tsc&&node ./lib/bin/www",
+    "dev": "set NODE_ENV=development&&tsc&& concurrently --kill-others \"tsc -w\" \"nodemon ./lib/bin/www\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Muhammad Salahuddin",
@@ -16,6 +16,7 @@
     "body-parser": "^1.19.0",
     "cli-spinner": "^0.2.10",
     "composable-middleware": "^0.3.0",
+    "concurrently": "^5.3.0",
     "config": "^3.3.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",

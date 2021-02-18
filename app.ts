@@ -41,6 +41,6 @@ app.use("/console", require('./routes/console'));
 
 app.use("/api", require("./routes/api"));
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-require("./routes/web")(app);;
+require("./routes/web")(app);
 
 module.exports = app;

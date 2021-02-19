@@ -3,14 +3,14 @@
 // const { User } = require('../models/user.model');
 import User, { IUser } from '../models/user.model';
 import { token } from "../services/auth.service";
-import { sendUserVerifyEmail } from "../mail";
+import { MailSender } from "../mail";
 import moment from 'moment';
 const select = { salt: 0, hashedPassword: 0, failedPasswordsAttempt: 0, isEmailVerified: 0, isActive: 0, isDeleted: 0, createdDate: 0, updatedDatae: 0 }
 const admin_select = { salt: 0, hashedPassword: 0, failedPasswordsAttempt: 0 }
 
-export let create = function (userData): Promise<IUser[]> {
+export let create = function (userData): Promise<IUser> {
     return new Promise(function (resolve, reject) {
-        User.create(userData, (err, user) => {
+        User.create(userData, (err, user:IUser) => {
             if (err) {
                 reject(err);
             } else {
@@ -20,11 +20,9 @@ export let create = function (userData): Promise<IUser[]> {
                     },
                     callback: ({ token: { token: token } }) => {
                         // SEND USER VERIFICATION EMAIL
-                        sendUserVerifyEmail({
-                            token,
-                            user
-                        }).then(data => {
-                            resolve(user);
+                        let mail_sender_obj = new MailSender(user,token)
+                        mail_sender_obj.sendUserVerifyEmail().then(data => {
+                            resolve(data);
                         }).catch(error => {
                             reject(error)
                         });
@@ -37,7 +35,7 @@ export let create = function (userData): Promise<IUser[]> {
 }
 
 
-export let findOne = function (query) {
+export let findOne = function (query): Promise<IUser> {
     return new Promise(function (resolve, reject) {
         User.findOne(query, function (err, user) {
             if (err) {
@@ -50,7 +48,7 @@ export let findOne = function (query) {
     })
 }
 
-export let findOneAndUpdate = function (query, data, options): any {
+export let findOneAndUpdate = function (query, data, options): Promise<any> {
     return new Promise(function (resolve, reject) {
         User.findOneAndUpdate(query, data, options, function (err, result) {
             if (err) {
@@ -63,7 +61,7 @@ export let findOneAndUpdate = function (query, data, options): any {
     })
 }
 
-export let passwordCheck = function ({ password, user }) {
+export let passwordCheck = function ({ password, user }): Promise<any> {
     return new Promise(function (resolve, reject) {
         if (moment(user.failedPasswordsAttempt.blockedTill).isSameOrAfter(moment()) == true) {
             var errors = {
@@ -143,7 +141,7 @@ export let passwordCheck = function ({ password, user }) {
 }
 
 
-export let update = function (query, data, options = null) {
+export let update = function (query, data, options = null): Promise<any> {
     return new Promise(function (resolve, reject) {
         User.update(query, data, options, function (err, result) {
             if (err) {
@@ -156,7 +154,7 @@ export let update = function (query, data, options = null) {
     })
 }
 
-export let findById = function (userId) {
+export let findById = function (userId): Promise<IUser> {
     return new Promise(function (resolve, reject) {
         User.findById(userId, select)
             .then((user) => {

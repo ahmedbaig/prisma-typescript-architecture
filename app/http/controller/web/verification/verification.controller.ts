@@ -1,5 +1,5 @@
 import path from "path";
-import appRoot from "app-root-path"
+import * as appRoot from "app-root-path"
 import { verifyNewAccountToken } from '../../../services/auth.service';
 import { findById, update } from "../../../services/user.service";
 import { MailSender } from "../../../mail";

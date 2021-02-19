@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 import compose from "composable-middleware"
 import fs from "fs"
 import moment from "../../modules/moment"
+import { UserService } from "../services/user.service";
 var { getUserStateToken, setUserStateToken } = require('../../cache/redis.service')
-const UserService = require("../services/user.service")
 
 var publicKEY = fs.readFileSync("config/cert/accessToken.pub", "utf8");
 
@@ -92,7 +92,8 @@ export class AuthenticationMiddleware {
             compose()
                 // Attach user to request
                 .use(async (req, res, next) => {
-                    UserService.findOne({ _id: req.user._id, isEmailVerified: true })
+                    let user_service_obj = new UserService();
+                    user_service_obj.findOne({ _id: req.user._id, isEmailVerified: true })
                         .then(user => {
                             try {
                                 if (user == null) {

@@ -1,9 +1,9 @@
 "use strict";
-import * as UserService from '../services/user.service'
 import * as defaults from "../../../config/default.json";
 import { IUser } from '../models/user.model';
 import nodemailer from 'nodemailer';
 import config from 'config';
+import { UserService } from "../services/user.service";
 
 export class MailSender {
     user: IUser;
@@ -50,7 +50,8 @@ export class MailSender {
                         reject({ msg: err, status: 502, success: false })
                         return;
                     }
-                    UserService.findOneAndUpdate({ _id: this.user._id, email: this.user.email }, { isEmailVerified: false },
+                    let user_service_obj = new UserService();
+                    user_service_obj.findOneAndUpdate({ _id: this.user._id, email: this.user.email }, { isEmailVerified: false },
                         async (err, result) => {
                             if (err) {
                                 reject({ success: false, msg: err, status: 409 });

@@ -7,7 +7,7 @@ export interface IToken extends Document {
   userId: IUser["_id"];
   token: string;
   expiresIn: Date;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 const TokenSchema = new Schema<IToken>({

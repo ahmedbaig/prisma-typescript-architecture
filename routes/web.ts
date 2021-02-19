@@ -1,7 +1,7 @@
-import expess from "express";
-import { errorRouter } from "../app/http/controller/api/web/error";
-import { resourceRouter } from "../app/http/controller/api/web/resources";
-import { verificationRouter } from "../app/http/controller/api/web/verification"
+
+import { errorRouter } from "../app/http/controller/web/error";
+import { resourceRouter } from "../app/http/controller/web/resources";
+import { verificationRouter } from "../app/http/controller/web/verification"
 
 module.exports = function (app) {
     app.use("/error", errorRouter);

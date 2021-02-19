@@ -4,14 +4,16 @@
  * Module dependencies.
  */
 require('dotenv').config()
-var Spinner = require("cli-spinner").Spinner;
-var app = require("../app");
-var fs = require("fs");
-var http = require("http");
-var moment = require("moment");
-const mongoose = require("mongoose");
-const { connect_cache } = require("../app/cache/redis.service");
+var app = require("../app")
+import http from 'http';
 import config from 'config';
+import moment from 'moment';
+import mongoose from 'mongoose';
+import fs from 'fs';
+import { Spinner } from 'cli-spinner';
+
+import { RedisService } from '../app/cache/redis.service';
+let redis_obj = new RedisService()
 /**
  * Get port from environment and store in Express.
  */
@@ -34,7 +36,7 @@ mongoose
         console.clear();
         spinner.stop(true);
         console.info(`✔️ Database Connected (${process.env.NODE_ENV})`);
-        connect_cache()
+        redis_obj.connect_cache()
             .then(() => {
                 console.info("✔️ Redis Cache Connected");
                 /**

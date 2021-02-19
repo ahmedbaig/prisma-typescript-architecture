@@ -2,18 +2,21 @@ import * as _ from 'lodash'
 import moment from '../../../../modules/moment';
 import * as UserService from '../../../services/user.service';
 import { generateAuthToken } from "../../../services/auth.service";
-import { setUserStateToken } from '../../../../cache/redis.service';
+import { RedisService } from '../../../../cache/redis.service';
 import { OAuth2Client } from 'google-auth-library';
-let client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, '', '');
-
-export class User {
+export class User extends RedisService{
+    client
+    constructor(){
+        super();
+        this.client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, '', '');
+    }
     register(req, res) {
         try {
-            // NOT NEEDED FOR NOW
-            // if(moment(req.body.dob).olderThan13()){
-            //     res.status(409).send({ success: false, msg: "Details do not meet the required age limit" })
-            //     return;
-            // }
+            // NOT NEEDED FOR NOW 
+            if(!moment(req.body.dob).olderThan13()){
+                res.status(409).send({ success: false, msg: "Details do not meet the required age limit" })
+                return;
+            }
             UserService.create(req.body).then(data => {
                 res.status(200).send(data);
             }).catch((error) => {
@@ -60,7 +63,7 @@ export class User {
                 UserService.passwordCheck({ user, password })
                     .then(() => {
                         generateAuthToken({ _id: user._id, type: user.type }, (token) => {
-                            setUserStateToken(token, moment(moment().add(48, 'hours')).fromNow_seconds())
+                            super.setUserStateToken(token, moment(moment().add(48, 'hours')).fromNow_seconds())
                                 .then(
                                     () => {
                                         user = _.pick(user, [
@@ -109,7 +112,7 @@ export class User {
         //https://spyna.medium.com/how-really-protect-your-rest-api-after-social-login-with-node-js-3617c336ebed
 
         console.log(process.env.GOOGLE_CLIENT_ID, 'process.env.GOOGLE_CLIENT_ID')
-        client.verifyIdToken({ idToken: req.body.token, audience: process.env.GOOGLE_CLIENT_ID })
+        this.client.verifyIdToken({ idToken: req.body.token, audience: process.env.GOOGLE_CLIENT_ID })
             .then((login) => {
                 console.log("🚀 ~ file: user.controller.ts ~ line 52 ~ .then ~ login", login)
 
@@ -120,6 +123,10 @@ export class User {
                 //throw an error if something gos wrong
                 console.log("error while authenticating google user: " + JSON.stringify(err));
             })
+        res.send("success")
+    }
+
+    get(req, res){
         res.send("success")
     }
 }

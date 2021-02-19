@@ -2,9 +2,8 @@
 import * as UserService from '../services/user.service'
 import * as defaults from "../../../config/default.json";
 import { IUser } from '../models/user.model';
-
-const nodemailer = require("nodemailer");
-const config = require('config')
+import nodemailer from 'nodemailer';
+import config from 'config';
 
 export class MailSender {
     user: IUser;

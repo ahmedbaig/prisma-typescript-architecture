@@ -1,8 +1,7 @@
 "use strict";
 
 import { IUser, Type, Address } from "../models/user.model";
-
-const Joi = require("joi");
+import * as Joi from "joi";
 interface UserRegister extends IUser{
     email: string;
     password: string;
@@ -28,7 +27,7 @@ interface UserSocialLogin extends IUser{
 }
 export class Validator {
     constructor(){}
-    
+
     //************************ VALIDATE USER REGISTER DATA ***********************//
     validateRegisterData(data: UserRegister) {
         const schema = Joi.object().keys({

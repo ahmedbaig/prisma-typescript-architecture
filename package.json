@@ -1,8 +1,8 @@
 {
-  "name": "beauty_salon",
+  "name": "node_typescript",
   "version": "1.0.0",
   "description": "",
-  "main": "./lib/app",
+  "main": "./lib/bin/www",
   "scripts": {
     "start": "set NODE_ENV=production&&tsc&&node ./lib/bin/www",
     "dev": "set NODE_ENV=development&&tsc&& concurrently --kill-others \"tsc -w\" \"nodemon ./lib/bin/www\"",
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@sendgrid/mail": "^7.4.2",
+    "@types/moment": "^2.13.0",
     "app-root-path": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",

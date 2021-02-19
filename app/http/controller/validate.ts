@@ -1,58 +1,76 @@
 "use strict";
 
+import { IUser, Type, Address } from "../models/user.model";
+
 const Joi = require("joi");
-interface RegisterData {
+interface UserRegister extends IUser{
     email: string;
     password: string;
-    dob: string;
+    dob: Date;
     phoneNo: number;
+    type: Type,
+    firstName?: string;
+    middleName?: string,
+    lastName?: string,
+    address?: Address,
+    gcm_id?: string[],
+    platform: string,
 }
-//************************ VALIDATE USER REGISTER DATA ***********************//
-function validateRegisterData(data: any) {
-    const schema = Joi.object().keys({
-        // REQURIED 
-        email: Joi.string().email({ minDomainAtoms: 2 }).required(),
-        password: Joi.string().min(8).required(),
-        dob: Joi.date().required(),
-        phoneNo: Joi.number().required(),
-        // ssn: Joi.number().min(1000).max(9999).required(),
-        // OPTIONAL
-        firstName: Joi.string().min(3),
-        middleName: Joi.string().min(1),
-        lastName: Joi.string().min(3),
-        address: Joi.object().keys({
-            street: Joi.string(),
-            city: Joi.string(),
-            postalCode: Joi.string(),
-        }),
-        type: Joi.string(),
-        gcm_id: Joi,
-        platform: Joi.string(),
-    });
-    return Joi.validate(data, schema);
+interface UserLogin extends IUser{
+    email: string;
+    password: string;
+    type: Type;
 }
+interface UserSocialLogin extends IUser{
+    token: string;
+    gcm_id: string[];
+    platform: string;
+}
+export class Validator {
+    constructor(){}
+    
+    //************************ VALIDATE USER REGISTER DATA ***********************//
+    validateRegisterData(data: UserRegister) {
+        const schema = Joi.object().keys({
+            // REQURIED 
+            email: Joi.string().email({ minDomainAtoms: 2 }).required(),
+            password: Joi.string().min(8).required(),
+            dob: Joi.date().required(),
+            phoneNo: Joi.number().required(),
+            type: Joi.string().required(),
+            // ssn: Joi.number().min(1000).max(9999).required(),
+            // OPTIONAL
+            firstName: Joi.string().min(3),
+            middleName: Joi.string().min(1),
+            lastName: Joi.string().min(3),
+            address: Joi.object().keys({
+                street: Joi.string(),
+                city: Joi.string(),
+                postalCode: Joi.string(),
+            }),
+            gcm_id: Joi.array().items(Joi.string()),
+            platform: Joi.string(),
+        });
+        return Joi.validate(data, schema);
+    }
 
-//************************ VALIDATE USER LOGIN DATA ***********************//
-function validateLoginData(data) {
-    const schema = Joi.object().keys({
-        email: Joi.string().email({ minDomainAtoms: 2 }).required(),
-        password: Joi.string().min(5),
-        type: Joi.string()
-    });
-    return Joi.validate(data, schema);
-}
+    //************************ VALIDATE USER LOGIN DATA ***********************//
+    validateLoginData(data: UserLogin) {
+        const schema = Joi.object().keys({
+            email: Joi.string().email({ minDomainAtoms: 2 }).required(),
+            password: Joi.string().min(5),
+            type: Joi.string()
+        });
+        return Joi.validate(data, schema);
+    }
 
-function socialLoginData(data) {
-    const schema = Joi.object().keys({
-        token: Joi.string().required(),
-        gcm_id: Joi,
-        platform: Joi.string(),
-    });
-    return Joi.validate(data, schema);
-}
-
-export default {
-    validateRegisterData,
-    validateLoginData,
-    socialLoginData
+    //************************ VALIDATE USER SOCIAL LOGIN DATA ***********************//
+    socialLoginData(data:UserSocialLogin) {
+        const schema = Joi.object().keys({
+            token: Joi.string().required(),
+            gcm_id: Joi.array().items(Joi.string()).required(),
+            platform: Joi.string().required(),
+        });
+        return Joi.validate(data, schema);
+    }
 }

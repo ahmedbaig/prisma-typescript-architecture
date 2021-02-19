@@ -1,63 +1,63 @@
-"use strict";
-var compose = require("composable-middleware");
-import moment from 'moment';
-import validation from "../controller/validate";
-
-export let validateUserRegistration = () => {
-    return (
-        compose()
-            .use(function (req, res, next) {
-                const { error } = validation.validateRegisterData(req.body);
-                if (error) {
-                    var errors = {
-                        success: false,
-                        msg: error.details[0].message,
-                        data: error.name,
-                    };
-                    res.status(400).send(errors);
-                    return;
-                } else {
-                    next();
-                }
-            })
-    )
-}
-
-export let validateUserLogin = () => {
-    return (
-        compose()
-            .use(function (req, res, next) {
-                const { error } = validation.validateLoginData(req.body);
-                if (error) {
-                    var errors = {
-                        success: false,
-                        msg: error.details[0].message,
-                        data: error.name,
-                    };
-                    res.status(400).send(errors);
-                    return;
-                } else {
-                    next();
-                }
-            })
-    )
-}
-
-export let validateSocialLogin = () => {
-    return (
-        compose()
-            .use(function (req, res, next) {
-                const { error } = validation.socialLoginData(req.body)
-                if (error) {
-                    var errors = {
-                        success: false,
-                        msg: error.details[0].message,
-                        data: error.name,
-                    };
-                    res.status(400).send(errors);
-                } else {
-                    next();
-                }
-            })
-    )
+import compose from "composable-middleware"
+import { Validator } from "../controller/validate";
+export class ValidationMiddleware extends Validator {
+    constructor() {
+        super();
+    }
+    validateUserRegistration() {
+        return (
+            compose()
+                .use((req, res, next) => {
+                    super.validateRegisterData(req.body)
+                        .then(data => {
+                            next();
+                        }).catch(error => {
+                            var errors = {
+                                success: false,
+                                msg: error.details[0].message,
+                                data: error.name,
+                            };
+                            res.status(400).send(errors);
+                            return;
+                        });
+                })
+        )
+    }
+    validateUserLogin() {
+        return (
+            compose()
+                .use((req, res, next) => {
+                    super.validateLoginData(req.body)
+                    .then(data=>{
+                        next();
+                    }).catch(error=>{
+                        var errors = {
+                            success: false,
+                            msg: error.details[0].message,
+                            data: error.name,
+                        };
+                        res.status(400).send(errors);
+                        return;
+                    })
+                })
+        )
+    }
+    validateSocialLogin() {
+        return (
+            compose()
+                .use((req, res, next) => {
+                    super.socialLoginData(req.body)
+                    .then(data=>{
+                        next();
+                    }).catch(error=>{
+                        var errors = {
+                            success: false,
+                            msg: error.details[0].message,
+                            data: error.name,
+                        };
+                        res.status(400).send(errors);
+                    })
+                })
+        )
+    }
 }

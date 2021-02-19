@@ -3,17 +3,8 @@ const jwt = require("jsonwebtoken");
 var compose = require("composable-middleware");
 const fs = require("fs");
 var publicKEY = fs.readFileSync("config/cert/accessToken.pub", "utf8");
-import moment from "moment";
 
-declare module "moment" {
-    interface Moment {
-        fromNow_seconds(): number;
-    }
-}
-(moment as any).fn.fromNow_seconds = function (a): number {
-    var duration = moment(this).diff(moment(), 'seconds');
-    return duration;
-};
+import moment from "../../modules/moment"
 
 const UserService = require("../services/user.service")
 var { getUserStateToken, setUserStateToken } = require('../../cache/redis.service')

@@ -1,8 +1,9 @@
 import express from "express";
-var app = express();
-var config = require('config')
-var path = require("path");
-const globalAny: any = global;
+const app = express();
+import * as appRoot from 'app-root-path'
+const config = require('config')
+const path = require("path");
+
 app.get("/health", function (req, res) {
   console.log({
     origin: config.get('origin'),
@@ -17,9 +18,11 @@ app.get("/health", function (req, res) {
     success: true,
   });
 });
+
 app.get("/logs", function (req, res) {
   let filePath = ".." + "\\" + "access.log";
   console.log();
-  res.sendFile(path.join(globalAny.ROOTPATH, 'access.log'));
+  res.sendFile(path.join(appRoot.path, 'access.log'));
 });
+
 module.exports = app;

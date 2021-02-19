@@ -1,9 +1,9 @@
 import path from "path";
+import * as appRoot from 'app-root-path'
 import { verifyNewAccountToken } from '../../../../services/auth.service';
 import { findById, update } from "../../../../services/user.service";
 import { sendUserVerifyEmail } from "../../../../mail";
-const globalAny: any = global;
-globalAny.ROOTPATH = __dirname;
+
 
 
 export let verify_email = (req, res) => {
@@ -12,7 +12,7 @@ export let verify_email = (req, res) => {
             var errorBags = [{
                 message: error.msg,
             },];
-            res.render(path.join(globalAny.ROOTPATH, "views/views/error/bags.ejs"), { errorBags });
+            res.render(path.join(appRoot.path, "views/views/error/bags.ejs"), { errorBags });
             return;
         },
         callback: (data) => {
@@ -22,14 +22,14 @@ export let verify_email = (req, res) => {
                         var errorBags = [{
                             message: "User not found",
                         },];
-                        res.render(path.join(globalAny.ROOTPATH, "views/views/error/bags.ejs"), { errorBags });
+                        res.render(path.join(appRoot.path, "views/views/error/bags.ejs"), { errorBags });
                         return;
                     }
                     sendUserVerifyEmail({
                         token: data.token.token.token,
                         user
                     }).then(data => {
-                        res.render(path.join(globalAny.ROOTPATH, "views/views/pages/verify-email-resend.ejs"), {
+                        res.render(path.join(appRoot.path, "views/views/pages/verify-email-resend.ejs"), {
                             email: user.email,
                         });
                         return;
@@ -40,14 +40,14 @@ export let verify_email = (req, res) => {
                 } else { // DONE 
                     update({ _id: user._id }, { isEmailVerified: true })
                         .then(() => {
-                            res.render(path.join(globalAny.ROOTPATH, "views/views/pages/verify-email.ejs"), {
+                            res.render(path.join(appRoot.path, "views/views/pages/verify-email.ejs"), {
                                 email: user.email,
                             });
                         }).catch(error => {
                             var errorBags = [{
                                 message: error.msg,
                             },];
-                            res.render(path.join(globalAny.ROOTPATH, "views/views/error/bags.ejs"), { errorBags });
+                            res.render(path.join(appRoot.path, "views/views/error/bags.ejs"), { errorBags });
                             return;
                         })
                 }
@@ -55,7 +55,7 @@ export let verify_email = (req, res) => {
                 var errorBags = [{
                     message: error.msg,
                 },];
-                res.render(path.join(globalAny.ROOTPATH, "views/views/error/bags.ejs"), { errorBags });
+                res.render(path.join(appRoot.path, "views/views/error/bags.ejs"), { errorBags });
                 return;
             });
         }

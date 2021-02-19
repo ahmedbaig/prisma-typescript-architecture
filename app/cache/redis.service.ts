@@ -18,7 +18,7 @@ export class RedisService {
             });
         });
     };
-    protected setUserStateToken(auth, exp) {
+    protected setUserStateToken(auth: string, exp: number) {
         return new Promise((resolve, reject) => {
             try {
                 client.setex(`${auth}/state/token/expiry`, exp, JSON.stringify(auth));

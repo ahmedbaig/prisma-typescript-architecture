@@ -1,23 +1,25 @@
-import * as _ from 'lodash'
+import * as _ from 'lodash';
 import moment from '../../../../modules/moment';
-import * as UserService from '../../../services/user.service';
-import { generateAuthToken } from "../../../services/auth.service";
+import { UserService } from '../../../services/user.service';
 import { RedisService } from '../../../../cache/redis.service';
 import { OAuth2Client } from 'google-auth-library';
-export class User extends RedisService{
+import { AuthService } from '../../../services/auth.service';
+
+export class User extends RedisService {
     client
-    constructor(){
+    constructor() {
         super();
         this.client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, '', '');
     }
     register(req, res) {
         try {
             // NOT NEEDED FOR NOW 
-            if(!moment(req.body.dob).olderThan13()){
+            if (!moment(req.body.dob).olderThan13()) {
                 res.status(409).send({ success: false, msg: "Details do not meet the required age limit" })
                 return;
             }
-            UserService.create(req.body).then(data => {
+            let user_service_obj = new UserService()
+            user_service_obj.create(req.body).then(data => {
                 res.status(200).send(data);
             }).catch((error) => {
                 if (error.errors && error.errors.email && error.errors.email.message == 'The specified email address is already in use.') {
@@ -39,8 +41,8 @@ export class User extends RedisService{
     login(req, res) {
         try {
             let { email, password, type } = req.body;
-
-            UserService.findOne({
+            let user_service_obj = new UserService()
+            user_service_obj.findOne({
                 email,
                 isDeleted: false,
             }).then((user: any = {}) => {
@@ -60,9 +62,10 @@ export class User extends RedisService{
                     res.status(400).send(errors);
                     return;
                 }
-                UserService.passwordCheck({ user, password })
+                user_service_obj.passwordCheck({ user, password })
                     .then(() => {
-                        generateAuthToken({ _id: user._id, type: user.type }, (token) => {
+                        let auth_service_obj = new AuthService()
+                        auth_service_obj.generateAuthToken({ _id: user._id, type: user.type }, (token) => {
                             super.setUserStateToken(token, moment(moment().add(48, 'hours')).fromNow_seconds())
                                 .then(
                                     () => {
@@ -126,7 +129,7 @@ export class User extends RedisService{
         res.send("success")
     }
 
-    get(req, res){
+    get(req, res) {
         res.send("success")
     }
 }

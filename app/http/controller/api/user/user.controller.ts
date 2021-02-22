@@ -1,15 +1,15 @@
-import * as _ from 'lodash';
-import moment from '../../../../modules/moment';
-import { UserService } from '../../../services/user.service';
-import { RedisService } from '../../../../cache/redis.service';
-import { OAuth2Client } from 'google-auth-library';
-import { AuthService } from '../../../services/auth.service';
+import * as _ from "lodash";
+import moment from "../../../../modules/moment";
+import { UserService } from "../../../services/user.service";
+import { RedisService } from "../../../../cache/redis.service";
+import { OAuth2Client } from "google-auth-library";
+import { AuthService } from "../../../services/auth.service";
 
 export class User extends RedisService {
-    client
+    client;
     constructor() {
         super();
-        this.client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, '', '');
+        this.client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, "", "");
     }
     register(req, res) {
         try {
@@ -41,72 +41,90 @@ export class User extends RedisService {
     login(req, res) {
         try {
             let { email, password, type } = req.body;
-            let user_service_obj = new UserService()
-            user_service_obj.findOne({
-                email,
-                isDeleted: false,
-            }).then((user: any = {}) => {
-                if (!user) {
-                    var errors = {
-                        success: false,
-                        msg: "No user with this account exists!",
-                    };
-                    res.status(200).send(errors);
-                    return;
-                }
-                if (user.type != type) {
-                    var errors = {
-                        success: false,
-                        msg: "User type provided does not match",
-                    };
-                    res.status(400).send(errors);
-                    return;
-                }
-                user_service_obj.passwordCheck({ user, password })
-                    .then(() => {
-                        let auth_service_obj = new AuthService()
-                        auth_service_obj.generateAuthToken({ _id: user._id, type: user.type }, (token) => {
-                            super.setUserStateToken(token, moment(moment().add(48, 'hours')).fromNow_seconds())
-                                .then(
-                                    () => {
-                                        user = _.pick(user, [
-                                            "_id",
-                                            "type",
-                                            "profile_img",
-                                            "email",
-                                            "phoneNo",
-                                            "firstName",
-                                            "lastName",
-                                            "dob",
-                                            "address_1",
-                                            "address_2",
-                                            "country",
-                                            "city",
-                                            "state",
-                                            "postal_code",
-                                        ]);
-                                        user['access_token'] = token
-                                        var success = { success: true, msg: "Logged in successfully", user };
-                                        res.status(200).send(success);
-                                        return;
-                                    }
-                                )
-                                .catch((error) => {
-                                    res.status(500).send({ success: false, msg: error.message });
-                                    return;
-                                });
-                        })
-                    }).catch(errors => {
-                        res.status(errors.status).send({ success: false, msg: errors.msg });
+            let user_service_obj = new UserService();
+            user_service_obj
+                .findOne({
+                    email,
+                    isDeleted: false,
+                })
+                .then((user: any = {}) => {
+                    if (!user) {
+                        var errors = {
+                            success: false,
+                            msg: "No user with this account exists!",
+                        };
+                        res.status(200).send(errors);
                         return;
-                    })
-            }).catch(error => {
-                res.status(500).send({ success: false, msg: error.message });
-            });
+                    }
+                    if (user.type != type) {
+                        var errors = {
+                            success: false,
+                            msg: "User type provided does not match",
+                        };
+                        res.status(400).send(errors);
+                        return;
+                    }
+                    user_service_obj
+                        .passwordCheck({ user, password })
+                        .then(() => {
+                            let auth_service_obj = new AuthService();
+                            auth_service_obj.generateAuthToken(
+                                { _id: user._id, type: user.type },
+                                (token) => {
+                                    super
+                                        .setUserStateToken(
+                                            token,
+                                            moment(moment().add(48, "hours")).fromNow_seconds()
+                                        )
+                                        .then(() => {
+                                            user = _.pick(user, [
+                                                "_id",
+                                                "type",
+                                                "profile_img",
+                                                "email",
+                                                "phoneNo",
+                                                "firstName",
+                                                "lastName",
+                                                "dob",
+                                                "address_1",
+                                                "address_2",
+                                                "country",
+                                                "city",
+                                                "state",
+                                                "postal_code",
+                                            ]);
+                                            user["access_token"] = token;
+                                            var success = {
+                                                success: true,
+                                                msg: "Logged in successfully",
+                                                user,
+                                            };
+                                            res.status(200).send(success);
+                                            return;
+                                        })
+                                        .catch((error) => {
+                                            res
+                                                .status(500)
+                                                .send({ success: false, msg: error.message });
+                                            return;
+                                        });
+                                }
+                            );
+                        })
+                        .catch((errors) => {
+                            res
+                                .status(errors.status)
+                                .send({ success: false, msg: errors.msg });
+                            return;
+                        });
+                })
+                .catch((error) => {
+                    res.status(500).send({ success: false, msg: error.message });
+                });
         } catch (error) {
             res.status(500).send({ success: false, msg: error.message });
         }
-    };
+    }
 
     //************************ SOCIAL LOGIN ***************************//
     // This needs to be moved to some place better and handled differently
@@ -114,22 +132,52 @@ export class User extends RedisService {
         //social login document
         //https://spyna.medium.com/how-really-protect-your-rest-api-after-social-login-with-node-js-3617c336ebed
 
-        console.log(process.env.GOOGLE_CLIENT_ID, 'process.env.GOOGLE_CLIENT_ID')
-        this.client.verifyIdToken({ idToken: req.body.token, audience: process.env.GOOGLE_CLIENT_ID })
-            .then((login) => {
-                console.log("🚀 ~ file: user.controller.ts ~ line 52 ~ .then ~ login", login)
-
-            }).then((user) => {
-                console.log("🚀 ~ file: user.controller.ts ~ line 67 ~ .then ~ user", user)
-
-            }).catch(err => {
-                //throw an error if something gos wrong
-                console.log("error while authenticating google user: " + JSON.stringify(err));
+        console.log(process.env.GOOGLE_CLIENT_ID, "process.env.GOOGLE_CLIENT_ID");
+        this.client
+            .verifyIdToken({
+                idToken: req.body.token,
+                audience: process.env.GOOGLE_CLIENT_ID,
             })
-        res.send("success")
+            .then((login) => {
+                console.log(
+                    "🚀 ~ file: user.controller.ts ~ line 52 ~ .then ~ login",
+                    login
+                );
+            })
+            .then((user) => {
+                console.log(
+                    "🚀 ~ file: user.controller.ts ~ line 67 ~ .then ~ user",
+                    user
+                );
+            })
+            .catch((err) => {
+                //throw an error if something gos wrong
+                console.log(
+                    "error while authenticating google user: " + JSON.stringify(err)
+                );
+            });
+        res.send("success");
     }
 
     get(req, res) {
-        res.send("success")
+        try {
+            let limit = _.toInteger(req.query.limit);
+            let page = _.toInteger(req.query.page);
+            let user_service_obj = new UserService();
+            user_service_obj
+                .find({}, limit, page)
+                .then(({ users, count }) => {
+                    res.send({
+                        success: true, users,
+                        page: page,
+                        pages: Math.ceil(count / limit),
+                    });
+                })
+                .catch((error) => {
+                    res.status(error.status).send(error);
+                });
+        } catch (error) {
+            res.status(500).send({ success: false, msg: error.message });
+        }
     }
 }

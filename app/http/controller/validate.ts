@@ -1,8 +1,9 @@
 "use strict";
 
 import { IUser, Type, Address } from "../models/user.model";
+import { ICategories } from "../models/category.model";
 import * as Joi from "joi";
-interface UserRegister extends IUser{
+interface UserRegister extends IUser {
     email: string;
     password: string;
     dob: Date;
@@ -15,18 +16,24 @@ interface UserRegister extends IUser{
     gcm_id?: string[],
     platform: string,
 }
-interface UserLogin extends IUser{
+interface UserLogin extends IUser {
     email: string;
     password: string;
     type: Type;
 }
-interface UserSocialLogin extends IUser{
+interface UserSocialLogin extends IUser {
     token: string;
     gcm_id: string[];
     platform: string;
 }
+
+interface Categories extends ICategories {
+    name: string,
+    image: string
+}
+
 export class Validator {
-    constructor(){}
+    constructor() { }
 
     //************************ VALIDATE USER REGISTER DATA ***********************//
     validateRegisterData(data: UserRegister) {
@@ -64,11 +71,20 @@ export class Validator {
     }
 
     //************************ VALIDATE USER SOCIAL LOGIN DATA ***********************//
-    socialLoginData(data:UserSocialLogin) {
+    socialLoginData(data: UserSocialLogin) {
         const schema = Joi.object().keys({
             token: Joi.string().required(),
             gcm_id: Joi.array().items(Joi.string()).required(),
             platform: Joi.string().required(),
+        });
+        return Joi.validate(data, schema);
+    }
+
+    //************************ VALIDATE USER CATEGORY DATA ***********************//
+    validateCategoryData(data: Categories) {
+        const schema = Joi.object().keys({
+            name: Joi.string().required(),
+            image: Joi.string().required(),
         });
         return Joi.validate(data, schema);
     }

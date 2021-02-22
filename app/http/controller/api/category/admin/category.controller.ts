@@ -1,5 +1,5 @@
 
-import { CategorySerice } from "../../../services/category.service"
+import { CategorySerice } from "../../../../services/category.service"
 
 export class Category {
     constructor() {

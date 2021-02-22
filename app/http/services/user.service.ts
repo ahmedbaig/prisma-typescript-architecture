@@ -83,6 +83,7 @@ export class UserService {
                 });
         });
     }
+
     findOne(query): Promise<IUser> {
         return new Promise((resolve, reject) => {
             User.findOne(query, (err, user) => {

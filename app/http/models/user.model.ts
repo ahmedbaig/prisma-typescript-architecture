@@ -31,7 +31,8 @@ export interface IUser extends Document {
 export enum Type {
     user = 'user',
     reception = 'reception',
-    admin = 'admin'
+    admin = 'admin',
+    superAdmin = "Super Admin"
 }
 
 export interface Address extends Document {

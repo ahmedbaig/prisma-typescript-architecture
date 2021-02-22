@@ -28,17 +28,17 @@ export class ValidationMiddleware extends Validator {
             compose()
                 .use((req, res, next) => {
                     super.validateLoginData(req.body)
-                    .then(data=>{
-                        next();
-                    }).catch(error=>{
-                        var errors = {
-                            success: false,
-                            msg: error.details[0].message,
-                            data: error.name,
-                        };
-                        res.status(400).send(errors);
-                        return;
-                    })
+                        .then(data => {
+                            next();
+                        }).catch(error => {
+                            var errors = {
+                                success: false,
+                                msg: error.details[0].message,
+                                data: error.name,
+                            };
+                            res.status(400).send(errors);
+                            return;
+                        })
                 })
         )
     }
@@ -47,16 +47,16 @@ export class ValidationMiddleware extends Validator {
             compose()
                 .use((req, res, next) => {
                     super.socialLoginData(req.body)
-                    .then(data=>{
-                        next();
-                    }).catch(error=>{
-                        var errors = {
-                            success: false,
-                            msg: error.details[0].message,
-                            data: error.name,
-                        };
-                        res.status(400).send(errors);
-                    })
+                        .then(data => {
+                            next();
+                        }).catch(error => {
+                            var errors = {
+                                success: false,
+                                msg: error.details[0].message,
+                                data: error.name,
+                            };
+                            res.status(400).send(errors);
+                        })
                 })
         )
     }

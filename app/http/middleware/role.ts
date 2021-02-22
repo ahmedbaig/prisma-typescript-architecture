@@ -1,5 +1,19 @@
 import compose from "composable-middleware";
+import e from "express";
 export class RoleMiddleware {
+
+    isSuperAdmin() {
+        return (
+            compose()
+                .use((req, res, next) => {
+                    if (req.user.type == "Super Admin") {
+                        next();
+                    } else {
+                        res.status(401).send({ success: false, msg: "Inusfficient  privileges." })
+                    }
+                })
+        )
+    }
     isAdmin() {
         return (
             compose()

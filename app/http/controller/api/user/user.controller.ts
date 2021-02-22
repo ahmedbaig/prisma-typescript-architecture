@@ -14,10 +14,10 @@ export class User extends RedisService {
     register(req, res) {
         try {
             // NOT NEEDED FOR NOW 
-            if (!moment(req.body.dob).olderThan13()) {
-                res.status(409).send({ success: false, msg: "Details do not meet the required age limit" })
-                return;
-            }
+            // if (!moment(req.body.dob).olderThan13()) {
+            //     res.status(409).send({ success: false, msg: "Details do not meet the required age limit" })
+            //     return;
+            // }
             let user_service_obj = new UserService()
             user_service_obj.create(req.body).then(data => {
                 res.status(200).send(data);

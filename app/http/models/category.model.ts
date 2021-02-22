@@ -1,14 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
-import mongooseTypes from "mongoose-types";
 
-export interface IServices extends Document {
+export interface ICategories extends Document {
     name: string,
     image: string,
     createdDate: Date,
     updatedDate: Date
 }
 
-const ServiceSchema = new Schema<IServices>({
+const CategorySchema = new Schema<ICategories>({
     name: {
         type: String,
         required: true
@@ -27,7 +26,9 @@ const ServiceSchema = new Schema<IServices>({
     }
 });
 
-ServiceSchema.pre<IServices>('save', function (next) {
+CategorySchema.pre<ICategories>('save', function (next) {
     this.name.trim()[0].toUpperCase() + this.name.slice(1).toLowerCase();
     next();
 });
+
+export default mongoose.model<ICategories>('categories', CategorySchema);

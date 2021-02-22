@@ -1,16 +1,16 @@
 "use strict";
-import moment,{ unitOfTime } from "moment";
+import moment, { unitOfTime } from "moment";
 import * as defaults from "../../../config/default.json";
 
 import jwt from "jsonwebtoken";
 import fs from "fs";
 var privateKEY = fs.readFileSync('config/cert/accessToken.pem', 'utf8');
- 
-import { UserService } from "./user.service";
-import { TokenService } from "./token.service"; 
 
-export class AuthService{
-    private generateOTP():String {
+import { UserService } from "./user.service";
+import { TokenService } from "./token.service";
+
+export class AuthService {
+    private generateOTP(): String {
         var digits = "0123456789";
         let OTP = "";
         for (let i = 0; i < 6; i++) {
@@ -22,7 +22,7 @@ export class AuthService{
         return new Promise((resolve, reject) => {
             const option = { val: defaults.ACCESS_TOKEN.EXPIRE_NUM, unit: defaults.ACCESS_TOKEN.EXPIRE_VALUE }
             let body = {
-                userId: user._id, 
+                userId: user._id,
                 token,
                 expiresIn: moment().add(option.val, <unitOfTime.DurationConstructor>option.unit).toDate()
             };
@@ -40,7 +40,8 @@ export class AuthService{
             }
         })
     }
-    generateAuthToken({ _id, type }, callback):String {
+
+    generateAuthToken({ _id, type }, callback): String {
         var i = process.env.ISSUER_NAME;
         var s = process.env.SIGNED_BY_EMAIL;
         var a = process.env.AUDIENCE_SITE;
@@ -57,10 +58,11 @@ export class AuthService{
         var token = jwt.sign(payload, privateKEY, signOptions);
         return callback(token);
     }
+
     async token(data, { errorCallback, callback }) {
         var token = Buffer.from(this.generateOTP()).toString("base64");
         let user_service_obj = new UserService()
-        user_service_obj.findOne({ email: data.email }).then(async (user: any = {})=> {
+        user_service_obj.findOne({ email: data.email }).then(async (user: any = {}) => {
             if (!user) {
                 return errorCallback({
                     success: false,
@@ -99,6 +101,7 @@ export class AuthService{
             }
         }).catch(error => errorCallback({ success: false, status: 500, msg: error }));
     };
+
     async verifyNewAccountToken(token, { errorCallback, callback }) {
         let token_service_obj = new TokenService()
         token_service_obj.findOne({ token }).then((alreadyExist: any = {}) => {

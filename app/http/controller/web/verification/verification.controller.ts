@@ -1,10 +1,11 @@
 import path from "path";
-import * as appRoot from "app-root-path" 
+import * as appRoot from "app-root-path"
 import { UserService } from "../../../services/user.service";
 import { MailSender } from "../../../mail";
 import { AuthService } from "../../../services/auth.service";
 
 export class Verification {
+
     verify_email(req, res) {
         let auth_service_obj = new AuthService()
         auth_service_obj.verifyNewAccountToken(req.params.token, {

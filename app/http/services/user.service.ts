@@ -1,7 +1,7 @@
 'use strict';
 
 // const { User } = require('../models/user.model');
-import User, { IUser } from '../models/user.model'; 
+import User, { IUser } from '../models/user.model';
 import { MailSender } from "../mail";
 import moment from 'moment';
 import { AuthService } from './auth.service';
@@ -9,7 +9,7 @@ const select = { salt: 0, hashedPassword: 0, failedPasswordsAttempt: 0, isEmailV
 const admin_select = { salt: 0, hashedPassword: 0, failedPasswordsAttempt: 0 }
 
 export class UserService {
-    create(userData:IUser): Promise<IUser> {
+    create(userData: IUser): Promise<IUser> {
         return new Promise((resolve, reject) => {
             User.create(userData, (err, user: IUser) => {
                 if (err) {
@@ -48,7 +48,7 @@ export class UserService {
         })
     }
 
-    findOneAndUpdate(query, data, options=null): Promise<any> {
+    findOneAndUpdate(query, data, options = null): Promise<any> {
         return new Promise((resolve, reject) => {
             User.findOneAndUpdate(query, data, options, (err, result) => {
                 if (err) {

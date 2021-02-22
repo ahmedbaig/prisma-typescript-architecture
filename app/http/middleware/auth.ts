@@ -3,16 +3,19 @@ import compose from "composable-middleware"
 import fs from "fs"
 import moment from "../../modules/moment"
 import { UserService } from "../services/user.service";
-var { getUserStateToken, setUserStateToken } = require('../../cache/redis.service')
+import { RedisService } from "../../cache/redis.service";
 
 var publicKEY = fs.readFileSync("config/cert/accessToken.pub", "utf8");
 
-export class AuthenticationMiddleware {
+export class AuthenticationMiddleware extends RedisService {
+    constructor() {
+        super();
+    }
     isAuthenticated() {
         return (
             compose()
                 // Attach user to request
-                .use(function (req, res, next) {
+                .use((req, res, next) => {
                     let token = req.headers['x-access-token'] || req.headers['authorization'];
                     if (!token)
                         return res.status(401).send({
@@ -62,9 +65,9 @@ export class AuthenticationMiddleware {
     private refreshAuthToken() {
         return (
             compose()
-                .use(async (req, res, next) => {
+                .use((req, res, next) => {
                     // This middleware will verify if the jwt is not compromised after user logged out
-                    getUserStateToken(req.auth).then(data => {
+                    super.getUserStateToken(req.auth).then(data => {
                         if (data == null) {
                             console.log("Compromised Token!")
                             res.send({
@@ -74,7 +77,7 @@ export class AuthenticationMiddleware {
                             });
                             return;
                         } else {
-                            setUserStateToken(req.auth, moment(moment().add(48, 'hours')).fromNow_seconds())
+                            super.setUserStateToken(req.auth, moment(moment().add(48, 'hours')).fromNow_seconds())
                                 .then((success) => {
                                     if (success) {
                                         console.log("Refresh Token Record Updated")
@@ -91,7 +94,7 @@ export class AuthenticationMiddleware {
         return (
             compose()
                 // Attach user to request
-                .use(async (req, res, next) => {
+                .use((req, res, next) => {
                     let user_service_obj = new UserService();
                     user_service_obj.findOne({ _id: req.user._id, isEmailVerified: true })
                         .then(user => {
@@ -132,7 +135,7 @@ export class AuthenticationMiddleware {
     }
     private expireAuthToken(auth, exp) {
         return new Promise((resolve, reject) => {
-            setUserStateToken(auth, moment(moment().add(exp, 'seconds')).fromNow_seconds())
+            super.setUserStateToken(auth, moment(moment().add(exp, 'seconds')).fromNow_seconds())
                 .then((success) => {
                     if (success) {
                         console.log(`Refresh Token record updated and expiring in ${exp} seconds`)

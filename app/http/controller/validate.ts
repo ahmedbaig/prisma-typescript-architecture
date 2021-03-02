@@ -84,7 +84,6 @@ export class Validator {
     validateCategoryData(data: Categories) {
         const schema = Joi.object().keys({
             name: Joi.string().required(),
-            image: Joi.string().required(),
         });
         return Joi.validate(data, schema);
     }

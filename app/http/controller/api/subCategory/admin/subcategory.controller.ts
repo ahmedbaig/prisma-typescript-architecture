@@ -1,16 +1,15 @@
 
-import { CategorySerice } from "../../../../services/category.service"
+import { SubCategoryService } from "../../../../services/subCategory.service"
 import { Cloudinary, IUploadsResponse } from "../../../../../constants/cloudinary";
-export class Category {
+export class SubCategory {
     constructor() {
     }
-    async createService(req, res) {
+    async createSubCategory(req, res) {
         let cloudinary_uploads = new Cloudinary()
-        let Category = new CategorySerice()
+        let subCategoryInstance = new SubCategoryService()
         try {
             const path = req.file.path;
-            const dir = `uploads/categories/`;
-            console.log(req.file.path)
+            const dir = `uploads/sub_categories/`;
             let imgUrl: IUploadsResponse = await cloudinary_uploads.uploads(path, dir);
             let { url, id } = imgUrl;
             let { name } = req.body;
@@ -19,8 +18,8 @@ export class Category {
                 image: url,
                 imageId: id
             }
-            let createCategory = await Category.create({ data: data, req });
-            res.status(200).send({ success: true, data: createCategory, msg: "Category created successfully" })
+            let createSubCategory = await subCategoryInstance.create({ data: data, req });
+            res.status(200).send({ success: true, data: createSubCategory, msg: "Sub Category created successfully" })
         } catch (error) {
             res.status(500).send({ success: false, msg: error.message })
         }

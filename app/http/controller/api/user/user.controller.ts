@@ -41,6 +41,7 @@ export class User extends RedisService {
     login(req, res) {
         try {
             let { email, password, type } = req.body;
+            console.log("🚀 ~ file: user.controller.ts ~ line 44 ~ User ~ login ~ req.body", req.body)
             let user_service_obj = new UserService();
             user_service_obj
                 .findOne({
@@ -48,6 +49,7 @@ export class User extends RedisService {
                     isDeleted: false,
                 })
                 .then((user: any = {}) => {
+                    console.log("🚀 ~ file: user.controller.ts ~ line 52 ~ User ~ .then ~ user", user)
                     if (!user) {
                         var errors = {
                             success: false,

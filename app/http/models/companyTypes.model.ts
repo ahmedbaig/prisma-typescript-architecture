@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ICategories extends Document {
-    name: string,
-    image: string,
-    imageId: string,
-    createdAt: Date,
+export interface ICompanyType extends Document {
+    name: string;
+    image: string;
+    imageId: string;
+    createAt: Date;
     updatedAt: Date
-}
+};
 
-const CategorySchema = new Schema<ICategories>({
+const companyTypeSchema = new Schema<ICompanyType>({
     name: {
         type: String,
         required: true
@@ -21,19 +21,18 @@ const CategorySchema = new Schema<ICategories>({
         type: String,
         required: true
     },
-    createdDate: {
+    createdAt: {
         type: Date,
-        default: Date.now,
+        default: Date.now
     },
-    updatedDate: {
+    updatedAt: {
         type: Date,
-        default: null,
+        default: null
     }
 });
-
-CategorySchema.pre<ICategories>('save', function (next) {
+companyTypeSchema.pre<ICompanyType>('save', function (next) {
     this.name.trim()[0].toUpperCase() + this.name.slice(1).toLowerCase();
     next();
 });
 
-export default mongoose.model<ICategories>('categories', CategorySchema);
+export default mongoose.model<ICompanyType>("company_types", companyTypeSchema)

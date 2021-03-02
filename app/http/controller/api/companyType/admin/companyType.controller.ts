@@ -1,16 +1,14 @@
-
-import { CategorySerice } from "../../../../services/category.service"
+import { CompanyTypeService } from "../../../../services/companyTypes.service";
 import { Cloudinary, IUploadsResponse } from "../../../../../constants/cloudinary";
-export class Category {
+export class CompanyTypeController {
     constructor() {
     }
-    async createService(req, res) {
-        let cloudinary_uploads = new Cloudinary()
-        let Category = new CategorySerice()
+    async create(req, res) {
+        let cloudinary_uploads = new Cloudinary();
+        let companyTypeServiceInstance = new CompanyTypeService();
         try {
             const path = req.file.path;
-            const dir = `uploads/categories/`;
-            console.log(req.file.path)
+            const dir = `uploads/company_type/`;
             let imgUrl: IUploadsResponse = await cloudinary_uploads.uploads(path, dir);
             let { url, id } = imgUrl;
             let { name } = req.body;
@@ -19,10 +17,10 @@ export class Category {
                 image: url,
                 imageId: id
             }
-            let createCategory = await Category.create({ data: data, req });
-            res.status(200).send({ success: true, data: createCategory, msg: "Category created successfully" })
+            let createSubCategory = await companyTypeServiceInstance.create({ data: data, req });
+            res.status(200).send({ success: true, data: createSubCategory, msg: "Company type created successfully" })
         } catch (error) {
             res.status(500).send({ success: false, msg: error.message })
         }
     }
-} 
+}

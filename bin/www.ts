@@ -26,7 +26,7 @@ app.set("port", port);
 var server = http.createServer(app);
 /* Make sure to change URI before deployment */
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_CLUSTER}/${config.get('db.name')}?retryWrites=true&w=majority`;
-console.log("🚀 ~ file: www.ts ~ line 29 ~ uri", uri)
+
 Spinner.setDefaultSpinnerString(19);
 var spinner = new Spinner("Connecting to database.. %s");
 spinner.start();

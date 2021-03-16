@@ -10,10 +10,12 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
     env_variable: process.env.CLOUDINARY_ENV_VARIABLE
 });
-
+export interface IUploadsResponse{
+    url: string,
+    id: string
+}
 export class Cloudinary {
-
-    uploads(file, name) {
+    uploads(file, name): Promise<IUploadsResponse> {
         return new Promise((resolve, reject) => {
             try {
                 cloudinary.uploader.upload(file, (result) => {

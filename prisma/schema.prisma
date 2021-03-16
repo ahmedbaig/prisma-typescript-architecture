@@ -1,0 +1,162 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+//*************** TRANSACTIONS LEVEL ***************//
+model Transaction {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  paidAt    DateTime
+  user      User     @relation(fields: [userId], references: [id]) // One user
+  userId    String
+  product   SKU      @relation(fields: [skuId], references: [id]) // One SKU
+  skuId     String
+  token     Token[] // Many tokens (if they get expired or revoked)
+  isPaid    Boolean  @default(false)
+  amount    Int
+  gst       Int
+}
+
+model GST {
+  pc   Int // Percentage
+  name String
+  SKU SKU[] // Many SKUS
+
+  @@id([name])
+}
+
+//*************** PRODUCT LEVEL ***************//
+model Product {
+  id          String     @id @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  published   Boolean    @default(false)
+  title       String     @db.VarChar(50)
+  description String     @db.VarChar(255)
+  baseCost    Int
+  currency    String
+  refundable  Boolean    @default(false)
+  reviews     Rating[] // Many ratings
+  categories  Category[] @relation(references: [id]) // Many categories
+  tags        Tag[]      @relation(references: [name]) // Many tags
+  author      User?      @relation(references: [id], fields: [authorId]) // One owner
+  authorId    String?
+}
+
+model Variant {
+  id    String   @id @default(uuid())
+  my    DateTime // Model Year 
+  color Color[] // Many colors
+}
+
+model Color {
+  id        String   @id @default(uuid())
+  hex       String
+  name      String?
+  sku       SKU[] // Many SKUS
+  Variant   Variant? @relation(fields: [variantId], references: [id]) // One Variant
+  variantId String?
+}
+
+model SKU {
+  id          String        @id @default(uuid())
+  quantity    Int
+  soldOut     Boolean       @default(false)
+  isActive    Boolean       @default(false)
+  retailPrice Int
+  currency    String
+  gst         GST           @relation(fields: [gstName], references: [name])
+  gstName     String
+  transaction Transaction[] // Many transactions
+  Color       Color?        @relation(fields: [colorId], references: [id]) // One Color
+  colorId     String?
+}
+
+model Tag {
+  name     String    @id
+  products Product[] @relation(references: [id]) // Many products
+}
+
+model Category {
+  id      String    @id @default(uuid())
+  name    String
+  product Product[] @relation(references: [id]) // Many products
+}
+
+//*************** REVIEW LEVEL ***************//
+model Rating {
+  id        String  @id @default(uuid())
+  stars     Int     @db.SmallInt
+  message   String
+  product   Product @relation(fields: [productId], references: [id]) // One product
+  productId String 
+}
+
+//*************** USER LEVEL ***************//
+model User {
+  id                        String                     @id @default(uuid())
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  email                     String                     @unique
+  hashedPassword            String
+  salt                      String
+  blocked                   Boolean                    @default(false)
+  emailVerified             Boolean                    @default(false)
+  role                      Role                       @default(USER) // One role
+  posts                     Product[] // Many products
+  profile                   Profile? // One profile (optional)
+  IncorrectPasswordAttempts IncorrectPasswordAttempts? // One attempt record (optional)
+  token                     Token[] // Many tokens
+  Transaction               Transaction[]
+}
+
+model Profile {
+  username     String
+  profileImage String?
+  dob          String?
+  address      String?
+  city         String?
+  country      String?
+  state        String?
+  phoneNo      Int?
+  user         User    @relation(fields: [userId], references: [id])
+  userId       String
+
+  @@id([userId, username])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+model IncorrectPasswordAttempts {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  blockedTill DateTime?
+  User        User?     @relation(fields: [userId], references: [id]) // One user (optional)
+  userId      String?
+}
+
+model Token {
+  id            String      @id @default(uuid())
+  createdAt     DateTime    @default(now())
+  expiredIn     DateTime?
+  type          TokenTypes  @default(ACCOUNT_ACTIVATE) // One token type
+  user          User?       @relation(fields: [userId], references: [id]) // One user (optional)
+  userId        String?
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+}
+
+enum TokenTypes {
+  ACCOUNT_ACTIVATE
+  RESET_PASSWORD
+  TRANSACTION
+}

@@ -6,7 +6,6 @@
 /public
 /tmp
 /out-tsc
-/prisma/migrations
 
 # Env variables and confs
 .env 

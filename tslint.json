@@ -7,5 +7,9 @@
     "rules": {
         "no-console": false
     },
+    "exclude": [
+        "lib",
+        "prisma"
+    ],
     "rulesDirectory": []
 }

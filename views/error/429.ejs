@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../layouts/head'); %>
+</head>
+<link rel="stylesheet" href="/resources/css/style.css">
+
+<body class="container">
+    <div class="error-page">
+        <div>
+            <h1 data-h1="429">429</h1>
+            <p data-p="TOO MANY REQUESTS">TOO MANY REQUESTS</p>
+            <p data-p="<%=error%>">
+                <%=error%>
+            </p>
+        </div>
+    </div>
+    <form class="form-inline"  action="/reset-limit" method="post">
+        <div class="form-group mb-2">
+            <div class="g-recaptcha" data-callback="recaptchaCallback"
+            data-sitekey="6LcZ3AUbAAAAADCbA5NN2Nac_qomz6I7r-raxmGo"></div>
+        <span id="error-captcha"></span> 
+        </div>
+        <button type="submit" style="display: none;" id="submitBtn" name="login" class="btn btn-light btn-block mb-2"
+        data-status="success" data-pos="bottom-center"
+        data-uk-modal="{target:'#subscription_popup'}">Reset Request Limit</button>
+      </form>
+    <div id="particles-js"></div>
+
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <!--a(href="#").back GO BACK-->
+    <footer>
+        <%- include('../layouts/footer'); %>
+    </footer>
+
+    <script>
+        var checkCaptcha;
+        function login_captcha() {
+            e.preventDefault()
+            console.log("captcha");
+            $("#error-captcha").empty();
+            //checkCaptcha = true;
+            if (checkCaptcha) {
+                $("#submitBtn").show();
+            }
+            else {
+                console.log("insert captcha");
+                $("#error-captcha").append('<div class="parsley-errors-list filled" id="parsley-id-5"><span class="parsley-type">Please Insert the Captcha.</span></div>');
+            }
+        }
+        function recaptchaCallback() {
+            //alert("callback working");
+            checkCaptcha = true;
+            $("#submitBtn").show();
+            $("#error-captcha").empty();
+        };
+        $(document).ready(function () {
+            var checkCaptcha = false;
+            $("#error-captcha").empty();
+        });
+    </script>
+</body>
+
+</html>

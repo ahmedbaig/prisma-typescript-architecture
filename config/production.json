@@ -1,5 +1,8 @@
 {
-    "origin": "http://35.238.186.193:8080",
+    "origin": "https://iweave.herokuapp.com",
+    "front": "",
+    "fb-callback": "https://iweave.herokuapp.com/auth/facebook/callback",
+    "g-callback": "https://iweave.herokuapp.com/auth/google/callback", 
     "db": {
         "name": "production"
     }

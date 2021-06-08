@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Minnesota Realty School | Checkout</title>
+    <title>iWeave | Checkout</title>
     <style>
         .stripe-button-el {
             background: #f60386;
@@ -47,7 +47,7 @@
 
         <div class="container" style="margin-top: 40px;">
             <div class="row">
-                <div class="col-md-6 col-xs-6">Minnesota Realty School, 2020</div>
+                <div class="col-md-6 col-xs-6">iWeave, 2021</div>
                 <div class="col-md-6 col-xs-6" style="text-align: right;">Date :
                     <%=
                         moment(transaction.createdAt).format("LLLL") %>
@@ -163,7 +163,7 @@
                 <input type="hidden" name="type" value="<%=transaction.type%>">
                 <input type="hidden" name="token" value="<%=token%>">
                 <input type="hidden" name="amount" value="<%=transaction.payment.amount%>">
-                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="<%=stripe_pk%>" data-amount="<%=transaction.payment.amount*100%>" data-name="Minnesota Realty School" data-email="" data-description="<%=transaction.type%> purchase"
+                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="<%=stripe_pk%>" data-amount="<%=transaction.payment.amount*100%>" data-name="iWeave" data-email="" data-description="<%=transaction.type%> purchase"
                     data-label="Checkout" data-currency='usd' data-image="/resources-images/logo.png" data-locale="auto"></script>
             </form>
             <%

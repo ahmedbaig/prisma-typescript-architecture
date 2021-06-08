@@ -56,13 +56,13 @@ export class MailSender {
           let user_service_obj = new UserService();
           user_service_obj
             .findOneAndUpdate(
-              { _id: this.user._id, email: this.user.email },
+              { _id: this.user.id, email: this.user.email },
               { isEmailVerified: false }
             )
             .then((result) => {
               var data = {
                 success: true,
-                id: this.user._id,
+                id: this.user.id,
                 msg: "Please check your email for account verification!",
                 status: 200,
               };

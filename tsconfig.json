@@ -7,8 +7,7 @@
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
         "sourceMap": true,
-        "outDir": "lib",
-        "lib": ["esnext"],
+        "outDir": "lib"
     },
     "exclude": [
         "node_modules",

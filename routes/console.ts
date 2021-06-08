@@ -1,6 +1,9 @@
 import express from "express";
 const app = express();
 import * as appRoot from 'app-root-path'
+import { BrowserMiddleware } from "../app/http/middleware/browser";
+import { AuthenticationMiddleware } from "../app/http/middleware/auth";
+const auth_controller = new AuthenticationMiddleware();
 const config = require('config')
 const path = require("path");
 
@@ -9,6 +12,7 @@ app.get("/health", function (req, res) {
     origin: config.get('origin'),
     environment: process.env.NODE_ENV,
     port: process.env.PORT,
+    sql_db: process.env.DATABASE_URL,
     m_db_cluster: process.env.MONGO_CLUSTER,
     m_db_name: config.get('db.name'),
     r_host: process.env.REDIS_HOST,
@@ -19,9 +23,14 @@ app.get("/health", function (req, res) {
   });
 });
 
-app.get("/logs", function (req, res) {
-  let filePath = ".." + "\\" + "access.log";
-  console.log();
+app.get("/session", BrowserMiddleware.restrictedBrowser(), auth_controller.isAuthenticated(), function (req:any, res) {
+  res.json({
+    success: true,
+    data: req.user
+  });
+});
+
+app.get("/logs", BrowserMiddleware.restrictedBrowser(), function (req, res) {
   res.sendFile(path.join(appRoot.path, 'access.log'));
 });
 

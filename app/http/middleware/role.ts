@@ -30,3 +30,6 @@ export class RoleMiddleware {
         )
     }
 }
+
+const roleMiddleware = new RoleMiddleware();
+export default roleMiddleware;

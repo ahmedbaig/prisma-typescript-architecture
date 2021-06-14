@@ -3,15 +3,11 @@ import compose from "composable-middleware"
 import fs from "fs"
 import moment from "../../modules/moment"
 import { UserService } from "../services/user.service";
-import { RedisService } from "../../cache/redis.service";
-import { SenderService } from "../services/sender.service";
-
+import { Redis } from "../../cache/redis.service";  
+import { Sender } from "../common/sender.handler";
 var publicKEY = fs.readFileSync("config/cert/accessToken.pub", "utf8");
 
-export class AuthenticationMiddleware extends RedisService {
-    constructor() {
-        super();
-    }
+class AuthenticationMiddleware  {
     isAuthenticated() {
         return (
             compose()
@@ -19,7 +15,8 @@ export class AuthenticationMiddleware extends RedisService {
                 .use((req, res, next) => {
                     let token = req.session.auth; 
                     if (!token)
-                        return SenderService.errorSend(res, {
+                    
+                        return Sender.errorSend(res, {
                             success: false,
                             msg: "Access Denied.",
                             status: 401,
@@ -40,7 +37,7 @@ export class AuthenticationMiddleware extends RedisService {
                             Buffer.from(JWTSPLIT[0], "base64").toString()
                         );
                         if (decodedJWTHeader.alg != "RS256") {
-                            SenderService.errorSend(res, {
+                            Sender.errorSend(res, {
                                 success: false,
                                 msg: "Access Denied. Please login again.",
                                 status: 401,
@@ -53,7 +50,7 @@ export class AuthenticationMiddleware extends RedisService {
                         next();
                     } catch (ex) {
                         console.log("exception: " + ex);
-                        SenderService.errorSend(res, { success: false, msg: "Access Denied. Please login again", status: 400 });
+                        Sender.errorSend(res, { success: false, msg: "Access Denied. Please login again", status: 400 });
                     }
                 })
                 .use(this.isValid())
@@ -80,7 +77,7 @@ export class AuthenticationMiddleware extends RedisService {
                         .then(async user => {
                                 if (user == null) {
                                     await this.expireAuthToken(req, 10)
-                                    SenderService.errorSend(res, {
+                                    Sender.errorSend(res, {
                                         success: false,
                                         msg: "Your account access has been blocked.",
                                         status: 401,
@@ -102,3 +99,6 @@ export class AuthenticationMiddleware extends RedisService {
         })
     }
 }
+
+const authMiddleware = new AuthenticationMiddleware();
+export default authMiddleware;

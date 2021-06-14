@@ -1,14 +1,11 @@
 "use strict";
 
-import { RedisService } from "./redis.service";
-import * as _  from 'lodash';
-export class Redis extends RedisService{
-    constructor(){
-        super()
-    }
+import { Redis } from "./redis.service";
+import * as _ from 'lodash';
+export const redisController = new class RedisController {
     async getKeys(req, res) {
         try {
-            super.getRedisKeys()
+            Redis.getRedisKeys()
                 .then((data) => {
                     res.json(data);
                 })
@@ -23,7 +20,7 @@ export class Redis extends RedisService{
                 res.status(401).send({ success: false, message: "Missing credentials" })
                 return;
             } else if (req.body.pass == process.env.REDIS_PASS) {
-                super.deleteRedisKeys()
+                Redis.deleteRedisKeys()
                     .then((data) => {
                         res.json(data);
                     })
@@ -38,12 +35,12 @@ export class Redis extends RedisService{
     };
     async flushAuth(req, res) {
         try {
-    
+
             if (req.body.pass == null || req.body.key == null) {
                 res.status(401).send({ success: false, message: "Missing credentials / key" })
                 return;
             } else if (req.body.pass == process.env.REDIS_PASS) {
-                super.searchAndDeleteKeys(req.body.key)
+                Redis.searchAndDeleteKeys(req.body.key)
                     .then((data) => {
                         res.json(data);
                     })
@@ -56,4 +53,4 @@ export class Redis extends RedisService{
             res.send({ success: false, message: error.message });
         }
     };
-} 
+}

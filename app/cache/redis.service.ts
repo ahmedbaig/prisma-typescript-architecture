@@ -4,7 +4,7 @@ import { createClient } from "redis";
 const redisScan = require('node-redis-scan');
 let client: any;
 let scanner: any;
-export class RedisService {
+export const Redis = new class RedisService {
     connectCache(): any {
         // console.log("❗ Service Connecting to Redis...")
         let origin = {}
@@ -24,7 +24,7 @@ export class RedisService {
             console.error("❗ ", error);
         });
     }
-    protected setUserStateToken(auth: string, exp: number) {
+     setUserStateToken(auth: string, exp: number) {
         return new Promise((resolve, reject) => {
             try {
                 client.setex(`${auth}|token|expiry`, exp, JSON.stringify(auth));
@@ -34,7 +34,7 @@ export class RedisService {
             }
         });
     }
-    protected getUserStateToken(auth) {
+     getUserStateToken(auth) {
         return new Promise((resolve, reject) => {
             try {
                 client.get(`${auth}|token|expiry`, (err, data) => {
@@ -51,7 +51,7 @@ export class RedisService {
         });
     };
 
-    protected deleteUserStateToken(auth) {
+     deleteUserStateToken(auth) {
         return new Promise((resolve, reject) => {
             try {
                 client.del(`${auth}|token|expiry`, function (err, response) {
@@ -63,7 +63,7 @@ export class RedisService {
             }
         });
     };
-    protected searchData(pattern: string): Promise<any[]> {
+     searchData(pattern: string): Promise<any[]> {
         return new Promise(async (resolve, reject) => {
             try {
                 console.log(pattern)
@@ -100,7 +100,7 @@ export class RedisService {
             }
         });
     }
-    protected setData(data: any, key: string, exp: number = 3600) {
+     setData(data: any, key: string, exp: number = 3600) {
         return new Promise((resolve, reject) => {
             try {
                 if (exp == 0) {
@@ -114,7 +114,7 @@ export class RedisService {
             }
         });
     }
-    protected getData(key: string): Promise<any> {
+     getData(key: string): Promise<any> {
         return new Promise((resolve, reject) => {
             try {
                 client.get(`${key}`, (err, data) => {
@@ -130,7 +130,7 @@ export class RedisService {
             }
         });
     };
-    protected async getRedisKeys() {
+     async getRedisKeys() {
         return new Promise((resolve, reject) => {
             try {
                 client.keys("*", (err, keys) => {
@@ -145,7 +145,7 @@ export class RedisService {
             }
         });
     };
-    protected async deleteRedisKeys() {
+     async deleteRedisKeys() {
         return new Promise((resolve, reject) => {
             try {
                 client.flushdb((err, succeeded) => {
@@ -157,7 +157,7 @@ export class RedisService {
             }
         });
     };
-    protected async searchAndDeleteKeys(keyword) {
+     async searchAndDeleteKeys(keyword) {
         return new Promise((resolve, reject) => {
             try {
                 let key = "*" + keyword + "*";

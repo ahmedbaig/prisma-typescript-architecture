@@ -2,9 +2,9 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserCreateProfile, IUserProfile } from "../models/user.model";
 import { IProfileCreate } from '../models/profile.user.model';
-import { RedisService } from '../../cache/redis.service';
+import { Redis } from '../../cache/redis.service';
 
-const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_ACCOUNT_TOKEN);
+// const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_ACCOUNT_TOKEN);
 
 const selectUser = {
     id: true,
@@ -44,10 +44,9 @@ interface IFindResolver {
     users: IUserProfile[];
     count: number;
 }
-export class UserService extends RedisService {
+export class UserService  {
     private prisma;
     constructor() {
-        super()
         this.prisma = new PrismaClient();
     }
     parseUserBigIntJSON(_user): IUserProfile {
@@ -168,13 +167,13 @@ export class UserService extends RedisService {
     sendCode(phoneNo: string) {
         return new Promise((resolve, reject) => {
             try {
-                twilio.verify.services(process.env.TWILIO_SERVICE_SID)
-                    .verifications
-                    .create({ to: `+${phoneNo}`, channel: 'sms' })
-                    .then(async message => {
-                        resolve(message.sid)
-                    })
-                    .catch(error => { reject(error) })
+                // twilio.verify.services(process.env.TWILIO_SERVICE_SID)
+                //     .verifications
+                //     .create({ to: `+${phoneNo}`, channel: 'sms' })
+                //     .then(async message => {
+                //         resolve(message.sid)
+                //     })
+                //     .catch(error => { reject(error) })
             } catch (e) {
                 reject(e.message)
             }
@@ -185,23 +184,23 @@ export class UserService extends RedisService {
         return new Promise((resolve, reject) => {
             try {
                 if (code != 99) {
-                    twilio.verify.services(process.env.TWILIO_SERVICE_SID)
-                        .verificationChecks
-                        .create({ to: `+${phoneNo}`, code })
-                        .then(async message => {
-                            if (message.valid == true) {
-                                // SEND AUTH 
-                                this.findOneAdmin({ profile: { phoneNo } })
-                                    .then(user => {
-                                        if (user == null) resolve(null);
-                                        resolve(user);
-                                    })
-                                    .catch(error => reject(error))
-                            } else {
-                                reject("Code does not match the code sent to your phone")
-                            }
-                        })
-                        .catch(error => { reject(error) })
+                    // twilio.verify.services(process.env.TWILIO_SERVICE_SID)
+                    //     .verificationChecks
+                    //     .create({ to: `+${phoneNo}`, code })
+                    //     .then(async message => {
+                    //         if (message.valid == true) {
+                    //             // SEND AUTH 
+                    //             this.findOneAdmin({ profile: { phoneNo } })
+                    //                 .then(user => {
+                    //                     if (user == null) resolve(null);
+                    //                     resolve(user);
+                    //                 })
+                    //                 .catch(error => reject(error))
+                    //         } else {
+                    //             reject("Code does not match the code sent to your phone")
+                    //         }
+                    //     })
+                    //     .catch(error => { reject(error) })
                 } else {
                     this.findOneAdmin({ profile: { phoneNo } })
                         .then(user => {
@@ -217,10 +216,10 @@ export class UserService extends RedisService {
     }
 
     async redisSetUserData(auth: string, exp: number) {
-        await super.setUserStateToken(auth, exp);
+        await Redis.setUserStateToken(auth, exp);
     }
 
     async redisUpdateUser(_user: IUserProfile) {
-        await super.setData(_user.profile, `${_user.profile.phoneNo}|${_user.profile.firstName}|${_user.profile.lastName}|${_user.id}|user`, 0).catch((error) => { throw error })
+        await Redis.setData(_user.profile, `${_user.profile.phoneNo}|${_user.profile.firstName}|${_user.profile.lastName}|${_user.id}|user`, 0).catch((error) => { throw error })
     }
 }

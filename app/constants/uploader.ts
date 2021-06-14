@@ -1,7 +1,7 @@
 import compose from "composable-middleware"
 import fs from 'fs';
 import path from 'path'; 
-import { SenderService } from "../http/services/sender.service";
+import { Sender } from "../http/common/sender.handler";
 
 // This implementation requires busboy-body-parser initialized in app
 interface IFields {
@@ -17,9 +17,9 @@ export class Uploader {
                         names.forEach(o => {
                             if (req.files[o.name] != null) {
                                 Uploader.fileFilter(req.files[o.name], (error, status) => {
-                                    if (!status) SenderService.errorSend(res, { success: false, msg: error, status: 500 })
+                                    if (!status) Sender.errorSend(res, { success: false, msg: error, status: 500 })
                                     Uploader.fileStorage(req.files[o.name], (error, status, files) => {
-                                        if (!status) SenderService.errorSend(res, { success: false, msg: error, status: 500 })
+                                        if (!status) Sender.errorSend(res, { success: false, msg: error, status: 500 })
                                         req.body.files = files;
                                         next();
                                     })

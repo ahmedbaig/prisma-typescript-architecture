@@ -1,8 +1,8 @@
 "use strict";
 
-import { IUser, Role } from "../models/user.model";
+import { User, Role } from "../models/user.model";
 import * as Joi from "joi";
-interface UserRegister extends IUser {
+interface UserRegister extends User {
     email: string;
     password: string;
     phoneNo: number;
@@ -10,20 +10,20 @@ interface UserRegister extends IUser {
     gcm_id: string[],
     platform: string,
 }
-interface UserLogin extends IUser {
+interface UserLogin extends User {
     email: string;
     password: string;
     role: Role;
     gcm_id: string[],
     platform: string,
 }
-interface UserSocialLogin extends IUser {
+interface UserSocialLogin extends User {
     token: string;
     gcm_id: string[];
     platform: string;
 }
 
-interface UserUpdate extends IUser {
+interface UserUpdate extends User {
     username: string;
     name: string;
     about: string;

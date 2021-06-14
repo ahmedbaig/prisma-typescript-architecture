@@ -2,8 +2,7 @@ import express from "express";
 const app = express();
 import * as appRoot from 'app-root-path'
 import { BrowserMiddleware } from "../app/http/middleware/browser";
-import { AuthenticationMiddleware } from "../app/http/middleware/auth";
-const auth_controller = new AuthenticationMiddleware();
+import authMiddleware from "../app/http/middleware/auth";
 const config = require('config')
 const path = require("path");
 
@@ -23,7 +22,7 @@ app.get("/health", function (req, res) {
   });
 });
 
-app.get("/session", BrowserMiddleware.restrictedBrowser(), auth_controller.isAuthenticated(), function (req:any, res) {
+app.get("/session", BrowserMiddleware.restrictedBrowser(), authMiddleware.isAuthenticated(), function (req:any, res) {
   res.json({
     success: true,
     data: req.user

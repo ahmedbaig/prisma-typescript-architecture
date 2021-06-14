@@ -1,19 +1,19 @@
 "use strict";
 import * as defaults from "../../../config/default.json";
-import { IUser } from "../models/user.model";
+import { User } from "../models/user.model";
 import nodemailer from "nodemailer";
 import config from "config";
 import { UserService } from "../services/user.service";
 
 export class MailSender {
-  user: IUser;
+  user: User;
   token: String;
   transporter: any;
 
   constructor();
-  constructor(user: IUser);
-  constructor(user: IUser, token?: String);
-  constructor(user?: IUser, token?: string) {
+  constructor(user: User);
+  constructor(user: User, token?: String);
+  constructor(user?: User, token?: string) {
     this.user = user;
     this.token = token;
     this.transporter = nodemailer.createTransport({
